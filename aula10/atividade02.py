@@ -136,13 +136,56 @@ except Exception as e:
 
 try:
     # BATALHÕES COM MENOS CRIMES
-
-    print(30*'=')
+    df_cvli_menor = df_cvli[df_cvli['cvli'] < q1]
     
+    print(30*'=')
+    print(f'Batalhões com menos crimes\n{df_cvli_menor}')
+
+    # BATALHÕES COM MAIS CRIMES
+    df_cvli_maior = df_cvli[df_cvli['cvli'] > q3]
+    print(30*'=')
+    print(f'Batalhões com mais crimes\n{df_cvli_maior}')
+
+    # BATALHÕES COM OUTLIERS INFERIORES
+    df_cvli_outliers_inferiores = (
+        df_cvli[df_cvli['cvli'] < limite_inferior]
+        )
+    print('\n Batalhões com Outliers Inferiores')
+    print(30*'=')
+    if len(df_cvli_outliers_inferiores) == 0:
+        print('Não há outliers inferiores')
+    else:
+        print(df_cvli_outliers_inferiores)
+
+
+    # BATALHÕES COM OUTLIERS SUPERIORES 
+        
+    df_cvli_outliers_superiores =(
+        df_cvli[df_cvli['cvli'] > limite_superior]
+    )
+    print('\n Batalhões com Outliers Superiores')
+    print(30*'=')
+    if len(df_cvli_outliers_superiores) == 0:
+        print('Náo há outliers superiores')
+    else:
+        print(df_cvli_outliers_superiores)
+
+
+
+except Exception as e:
+    print(f'Erro ao apresentar batalhões')
+
+
+# PLOTANDO O GRÁFICO
+    
+try:
+
+
+
 
 
 
 
 
 except Exception as e:
-    print(f'Erro ao apresentar batalhões')
+    print(f'Erro ao plotar o gráfico {e}')
