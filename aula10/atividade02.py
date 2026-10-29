@@ -18,6 +18,13 @@ try:
 
     df_cvli = df_cvli.groupby('aisp', as_index=False)['cvli'].sum()
 
+    # Total de Crimes e Percentual por batalhão
+    total_crimes = df_cvli['cvli'].sum()
+    print(f'\nTotal de Crimes: {total_crimes}')
+
+    df_cvli['percentual %'] = round(
+        (df_cvli['cvli'] / total_crimes) * 100, 2
+    )
     
     # Colocar em ordem decrescente
 
@@ -104,6 +111,18 @@ except Exception as e:
     print(f'Erro ao calcular medidas {e}')
 
 
+# ASSIMETRIA E CURTOSE
+
+try:
+    assimetria = df_cvli['cvli'].skew()
+    print(f'\nAssimetria: {assimetria:.2f}')
+    # ASSIMETRIA POSITIVA ALTA
+
+    curtose = df_cvli['cvli'].kurtosis()
+    print(f'Curtose: {curtose:.2f}')
+
+except Exception as e:
+    print(f'Erro ao calcular assimetria {e}')
 # MOSTRAR AS MEDIDAS   
 
 try:
@@ -116,6 +135,7 @@ try:
      print(f'Q3: {q3}')
      print(f'Limite Superior: {limite_superior}')
      print(f'Maximo: {maximo}')
+     print(f'Total de Crimes: {total_crimes}')
     
      print(f'\nMédia: {media_cvli}')
      print(f'Mediana: {mediana_cvli}')
@@ -126,6 +146,9 @@ try:
      print(f'Distância entre Variância e Média: {dist_med_var:.2f}%')
      print(f'Desvio Padrão: {desvio_padrao:.2f}')
      print(f'Coeficiente de Variação: {coef_var:.2f}%')
+     print(f'Assimetria: {assimetria:.2f}')
+     print(f'Curtose: {curtose:.2f}')
+     
 
 except Exception as e:
     print(f'Erro ao apresentar as medidas {e}')
@@ -176,16 +199,83 @@ except Exception as e:
     print(f'Erro ao apresentar batalhões')
 
 
+
+
+
 # PLOTANDO O GRÁFICO
     
 try:
+    plt.figure(figsize=(18, 12))
+
+
+    # Posição 01 - BoxPlot
+    plt.subplot(2, 2, 1)
+
+    plt.boxplot(df_cvli['cvli'], orientation='horizontal', showfliers=True, showmeans=True)
+    plt.xlabel('Crimes')
+    plt.title('Distribuição de Dados')
+
+    # Posição 02 - Gráfico de Barras 10 maiores
+    df_cvli_10maiores = (
+        df_cvli_maior
+        .head(10)
+        .sort_values(by='cvli', ascending=True)
+
+    )
+
+    plt.subplot(2, 2, 2)
+    plt.bar(df_cvli_10maiores['aisp'].astype(str), df_cvli_10maiores['cvli'], edgecolor='black')
+    plt.xlabel('Batalhões', fontsize=12)
+    plt.ylabel('Crimes', fontsize=12)
+    plt.title('Top 10 - Maiores crimes')
+
+    # Posição 03 - Histograma
+    plt.subplot(2, 2, 3)
+    plt.hist(array_cvli, bins=10, edgecolor='black')
+    plt.axvline(media_cvli, color='red', linewidth=2)
+    plt.axvline(mediana_cvli, color='black', linewidth=2)
+
+    # CONTAGENS DE FAIXAS
+    contagens, limites = np.histogram(array_cvli, bins=10)
+    print(f'\n{30*'='}\nFaixas de crimes do Histograma\n')
+    for i in range(len(contagens)):
+         if contagens[i] > 0:
+            print(
+                f'Faixa {i+1}: '
+                f'{limites[i]:.0f} até {limites[i+1]:.0f} crimes'
+                f'=> {contagens[i]} Batalhões'
+
+
+            )
+    
+
+    # Posição 04 - Medidas
+    plt.subplot(2, 2, 4)
+    plt.text(0.1, 0.85, f'Menor valor: {minimo}', fontsize=12, fontweight='bold')
+    plt.text(0.1, 0.80, f'Limite Inferior: {limite_inferior}', fontsize=12, fontweight='bold')
+    plt.text(0.1, 0.75, f'Q1: {q1}', fontsize=12, fontweight='bold')
+    plt.text(0.1, 0.70, f'Q2: {q2}', fontsize=12, fontweight='bold')
+    plt.text(0.1, 0.65, f'Q3: {q3}', fontsize=12, fontweight='bold')
+    plt.text(0.1, 0.60, f'Limite Superior: {limite_superior}', fontsize=12, fontweight='bold')
+    plt.text(0.1, 0.55, f'Maior valor: {maximo}', fontsize=12, fontweight='bold')
+    plt.text(0.1, 0.50, f'Total de Crimes: {total_crimes}', fontsize=12, fontweight='bold')
+    
+    
+    plt.text(0.5, 0.85, f'Mediana: {mediana_cvli}', fontsize=12, fontweight='bold')
+    plt.text(0.5, 0.80, f'Média: {media_cvli:.2f}', fontsize=12, fontweight='bold')
+    plt.text(0.5, 0.75, f'Iqr: {iqr}', fontsize=12, fontweight='bold')
+    plt.text(0.5, 0.70, f'Distância: {distancia_cvli:.2f}%', fontsize=12, fontweight='bold')
+    plt.text(0.5, 0.65, f'Amplitude Total: {amplitude_total}', fontsize=12, fontweight='bold')
+    plt.text(0.5, 0.60, f'Desvio Padrão: {desvio_padrao:.2f}', fontsize=12, fontweight='bold')
+    plt.text(0.5, 0.55, f'Assimetria: {assimetria:.2f}', fontsize=12, fontweight='bold')
+    plt.text(0.5, 0.50, f'Curtose: {curtose:.2f}', fontsize=12, fontweight='bold')
+    plt.axis('off')
+
+    
 
 
 
-
-
-
-
-
+    plt.suptitle('Crimes Violentos Letais e Intencionais')
+    plt.show()
 except Exception as e:
     print(f'Erro ao plotar o gráfico {e}')
